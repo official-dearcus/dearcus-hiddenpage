@@ -47,6 +47,7 @@
   input::placeholder{color:var(--mute)}
   input:focus,select:focus,textarea:focus{outline:none;box-shadow:0 0 0 2px var(--green) inset}
   select:disabled{background:var(--chip);color:var(--mute)}
+  #histP1 option[value="__add__"]{font-weight:700;color:var(--green)}
   .field{margin-bottom:14px}
   .row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
   .row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px}
@@ -695,10 +696,11 @@ function fillProducts(keepId){
   const sel=$('histP1'), prev=keepId||sel.value;
   const opt=p=>'<option value="'+esc(p.id)+'">'+esc(p.name)+'</option>';
   const done=PRODUCTS.filter(p=>SAVED.has(p.id));
-  const todo=PRODUCTS.filter(p=>!SAVED.has(p.id));
+  // 아직 저장 전인 작업만 따로 노출 — 미저장 제품 전체는 목록에 쌓지 않습니다
+  const draft=PRODUCTS.filter(p=>!SAVED.has(p.id) && p.id===prev);
   sel.innerHTML='<option value="">제품 선택</option><option value="__add__">＋ 제품 추가</option>'
-    +(done.length?'<optgroup label="저장된 작업">'+done.map(opt).join('')+'</optgroup>':'')
-    +(todo.length?'<optgroup label="제품 목록">'+todo.map(opt).join('')+'</optgroup>':'');
+    +(draft.length?'<optgroup label="작업 중">'+draft.map(opt).join('')+'</optgroup>':'')
+    +(done.length?'<optgroup label="저장된 작업">'+done.map(opt).join('')+'</optgroup>':'');
   if(prev && PRODUCTS.some(p=>p.id===prev)) sel.value=prev;
 }
 
@@ -765,13 +767,25 @@ async function initProducts(){
   async function doAdd(){
     const n=$('pName').value.trim();
     if(!n){ alert('추가할 제품명을 입력해 주세요.'); return; }
-    if(PRODUCTS.some(p=>p.name===n)){ alert('이미 목록에 있습니다.'); return; }
-    const np={id:newPid(),name:n};
-    PRODUCTS.push(np); PRODUCTS.sort((a,b)=>a.name.localeCompare(b.name,'ko'));
-    try{ await Store.setProducts(PRODUCTS); }
-    catch(e){ alert('제품 추가에 실패했습니다.\n'+e.message); return; }
+
+    // 같은 이름이 이미 있으면 새로 만들지 않고 그 제품을 그대로 씁니다
+    let np=PRODUCTS.find(p=>p.name===n);
+    const hadRecord = np && SAVED.has(np.id);
+    if(!np){
+      np={id:newPid(),name:n};
+      PRODUCTS.push(np); PRODUCTS.sort((a,b)=>a.name.localeCompare(b.name,'ko'));
+      try{ await Store.setProducts(PRODUCTS); }
+      catch(e){ alert('제품 추가에 실패했습니다.\n'+e.message); return; }
+    }
     fillProducts(np.id); $('histP1').value=np.id;
-    closePanel(); applyProductPlaceholders(); resetWork(); renderHist();
+    closePanel(); applyProductPlaceholders();
+
+    if(hadRecord){                      // 저장된 기록이 있으면 새로 시작하지 않고 불러옵니다
+      alert('"'+n+'" 은 저장된 작업이 있어 기존 내용을 불러옵니다.');
+      await loadSaved(np.id);
+    }else{
+      resetWork(); renderHist();
+    }
   }
   $('pDel').onclick=async()=>{
     const id=curId(), n=curName();
