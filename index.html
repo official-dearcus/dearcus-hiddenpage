@@ -539,11 +539,19 @@ const Cache=(()=>{
 })();
 
 async function api(payload){
-  const r=await fetch(API_URL,{
-    method:'POST',
-    headers:{'Content-Type':'text/plain;charset=utf-8'},   // 사전요청(OPTIONS) 회피
-    body:JSON.stringify(Object.assign({token:API_TOKEN},payload))
-  });
+  const ac=new AbortController();
+  const timer=setTimeout(()=>ac.abort(),45000);          // 응답이 없으면 45초 뒤 중단
+  let r;
+  try{
+    r=await fetch(API_URL,{
+      method:'POST',
+      headers:{'Content-Type':'text/plain;charset=utf-8'}, // 사전요청(OPTIONS) 회피
+      body:JSON.stringify(Object.assign({token:API_TOKEN},payload)),
+      signal:ac.signal
+    });
+  }catch(e){
+    throw new Error(e.name==='AbortError' ? '서버 응답이 없습니다 (시간 초과)' : e.message);
+  }finally{ clearTimeout(timer); }
   const j=await r.json();
   if(!j.ok) throw new Error(j.error||'API_ERROR');
   return j;
@@ -818,14 +826,11 @@ $('histSave').onclick=async()=>{
   if(!id){ alert('제품을 먼저 선택해 주세요.'); return; }
   const dup=(await Store.list()).find(x=>x.id===id);
   if(dup && !confirm('"'+nm+'" 기록이 이미 있습니다.\n제품당 1건만 유지되므로 덮어씁니다. 계속할까요?')) return;
-  const btn=$('histSave'), label=btn.textContent;
-  btn.disabled=true; btn.textContent='저장 중…';
-  try{
+  await busy($('histSave'),'현재 설정 저장',async()=>{
     const ok=await Store.put({id,name:nm,date:stamp(),ts:Date.now(),data:snapshot()});
     if(!ok) alert('저장 공간이 부족합니다.');
-  }catch(e){ alert('저장에 실패했습니다.\n'+e.message); }
-  btn.disabled=false; btn.textContent=label;
-  renderHist();
+    renderHist();
+  });
 };
 $('histNew').onclick=()=>{
   if(!confirm('현재 입력을 모두 비우고 새로 시작할까요?')) return;
@@ -871,11 +876,24 @@ window.addEventListener('resize',()=>{ if(window.__fitMode) fitZoom(); });
 $('zoomFit').addEventListener('click',()=>{ window.__fitMode=true; });
 $('pvZoom').addEventListener('input',()=>{ window.__fitMode=false; });
 
+/* 버튼 상태를 항상 원래대로 되돌립니다 — 실패하든 성공하든 '저장 중…' 에 멈추지 않습니다 */
+async function busy(btn,label,fn){
+  if(btn.dataset.busy) return;
+  btn.dataset.busy='1'; btn.disabled=true; btn.textContent='저장 중…';
+  let done=false;
+  try{ await fn(); done=true; }
+  catch(e){ alert('저장에 실패했습니다.\n'+e.message); }
+  finally{
+    btn.textContent = done ? '저장됨' : label;
+    setTimeout(()=>{ btn.textContent=label; btn.disabled=false; delete btn.dataset.busy; },1200);
+  }
+}
+
 /* 메인타이틀 1행 이름으로 바로 저장 — 신규 건은 제품 목록을 거치지 않아도 됩니다 */
 async function quickSave(){
   const nm=V('t1').trim();
   if(!nm){ alert('메인타이틀 1행을 먼저 입력해 주세요.'); return; }
-  if(missing().length){ alert('가격을 모두 입력해야 저장할 수 있습니다.'); return; }
+  // 가격은 저장 조건이 아닙니다 — 이미지·문구만 먼저 저장해두고 나중에 채울 수 있습니다
 
   let prod=PRODUCTS.find(p=>p.name===nm);
   if(!prod){
@@ -886,17 +904,12 @@ async function quickSave(){
   }else if(SAVED.has(prod.id) &&
     !confirm('"'+nm+'" 기록이 이미 있습니다.\n덮어쓸까요?')) return;
 
-  const btn=$('t1Save'), label=btn.textContent;
-  btn.disabled=true; btn.textContent='저장 중…';
-  try{
+  const btn=$('t1Save');
+  await busy(btn,'저장',async()=>{
     await Store.put({id:prod.id,name:nm,date:stamp(),ts:Date.now(),data:snapshot()});
     fillProducts(prod.id); $('histP1').value=prod.id;
-    await renderHist();
-    btn.textContent='저장됨';
-  }catch(e){
-    alert('저장에 실패했습니다.\n'+e.message); btn.textContent=label;
-  }
-  setTimeout(()=>{ btn.disabled=false; btn.textContent=label; },1200);
+    renderHist();                       // 목록 갱신은 버튼 상태와 분리합니다
+  });
 }
 $('t1Save').onclick=quickSave;
 
