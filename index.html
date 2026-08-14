@@ -35,8 +35,8 @@
   .topact{display:flex;align-items:center;gap:8px}
   button.big{padding:14px 26px;font-size:14.5px;font-weight:700;border-radius:14px}
   button.danger:hover{border-color:#DE4F3C;color:#DE4F3C;background:#FDECE9}
-  button.danger.off{background:var(--chip);border-color:transparent;color:var(--mute)}
-  button.danger.off:hover{background:var(--chip);border-color:transparent;color:var(--mute);
+  button.off{background:var(--chip);border-color:transparent;color:var(--mute)}
+  button.off:hover{background:var(--chip);border-color:transparent;color:var(--mute);
     cursor:not-allowed}
   button.danger.armed{background:#DE4F3C;border-color:#DE4F3C;color:#fff}
   button.danger.armed:hover{background:#C63E2C;color:#fff}
@@ -346,6 +346,21 @@ const missing=()=>opts.reduce((a,o,i)=>{
   const gaps=['normal','sale','secret'].filter(k=>num(o[k])<=0);
   return gaps.length? a.concat('Option '+String(i+1).padStart(2,'0')) : a;
 },[]);
+
+/* 최종본 출력에 반드시 필요한 항목 — 비어 있으면 이름을 돌려줍니다 */
+function missingAll(){
+  const m=[];
+  const t=V('t1').trim();
+  if(!t || t===BASE_NAME) m.push('제품명');
+  if(!thumbImg) m.push('연출컷');
+  opts.forEach((o,i)=>{
+    const n='옵션 '+String(i+1).padStart(2,'0');
+    if(!o.l2.trim()) m.push(n+' 상품명 2행');
+    if(!o.img) m.push(n+' 제품컷');
+    if(['normal','sale','secret'].some(k=>num(o[k])<=0)) m.push(n+' 가격');
+  });
+  return m;
+}
 
 /* ---------- canvas helpers ---------- */
 function f(size,weight){return `${weight} ${size}px Pretendard, sans-serif`;}
@@ -1028,7 +1043,7 @@ function save(cv,name){ cv.toBlob(b=>{
 },'image/jpeg',0.95); }
 
 $('dlBoth').onclick=()=>{
-  if(missing().length){ flagLock(); return; }
+  if(missingAll().length){ flagLock(); return; }
   save($('cT'),'thumbnail_528x659.jpg');
   setTimeout(()=>save($('cD'),'detail_860x'+detailHeight()+'.jpg'),350);
   setTimeout(()=>quickSave(true),700);      // 출력하면 히스토리에도 자동 저장
@@ -1036,10 +1051,12 @@ $('dlBoth').onclick=()=>{
 
 let LOCK_SHOWN=false;                 // 저장·출력을 눌러본 뒤에만 안내를 띄웁니다
 function updateLock(){
-  const bad=missing().length>0;
-  if(!bad) LOCK_SHOWN=false;
-  const show=bad&&LOCK_SHOWN;
-  $('lockMsg').textContent = show ? '정상가·할인가·비밀 할인가를 입력해 주세요.' : '';
+  const m=missingAll();
+  if(!m.length) LOCK_SHOWN=false;
+  $('dlBoth').classList.toggle('off',m.length>0);
+  const show=m.length&&LOCK_SHOWN;
+  const head=m.slice(0,3).join(', ')+(m.length>3?' 외 '+(m.length-3)+'건':'');
+  $('lockMsg').textContent = show ? head+'을(를) 입력해 주세요.' : '';
   $('lockMsg').classList.toggle('on',show);
 }
 function flagLock(){ LOCK_SHOWN=true; updateLock(); }
@@ -1095,7 +1112,7 @@ async function quickSave(silent){
     !confirm('"'+nm+'" 기록이 이미 있습니다.\n덮어쓸까요?')) return;
 
   const btn=$('t1Save');
-  if(missing().length) flagLock();     // 저장은 되지만 가격이 비었음을 알려줍니다
+  if(missingAll().length) flagLock();   // 저장은 되지만 빠진 항목을 알려줍니다
   await busy(btn,'저장',async()=>{
     await Store.put({id:prod.id,name:nm,date:stamp(),ts:Date.now(),data:snapshot()});
     fillProducts(prod.id); $('histP1').value=prod.id;
