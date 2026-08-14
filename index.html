@@ -33,22 +33,28 @@
   .step.done b{color:var(--sub)}
   .stepline{width:34px;height:1px;background:var(--edge);flex:0 0 auto}
   .topact{display:flex;align-items:center;gap:8px}
+  button.big{padding:14px 26px;font-size:14.5px;font-weight:700;border-radius:14px}
 
   /* ---------- layout ---------- */
-  .main{display:grid;grid-template-columns:460px 1fr;gap:18px;padding:0 26px 26px;
-    align-items:start}
+  .main{display:grid;grid-template-columns:var(--panelw,460px) 10px 1fr;gap:8px;
+    padding:0 26px 26px;align-items:start}
+  .grip{height:calc(100vh - 116px);display:flex;align-items:center;justify-content:center;
+    cursor:col-resize;border-radius:6px}
+  .grip::before{content:"";width:3px;height:44px;border-radius:3px;background:var(--edge)}
+  .grip:hover::before,.grip.on::before{background:var(--green)}
   .panel{background:var(--paper);border:1px solid var(--edge);border-radius:var(--r);
     display:flex;flex-direction:column;height:calc(100vh - 116px)}
-  .panebox{overflow-y:auto;padding:24px;flex:1}
+  .panehead{display:flex;align-items:flex-start;gap:8px;padding:20px 22px 16px;
+    border-bottom:1px solid var(--line);background:var(--paper);
+    border-radius:var(--r) var(--r) 0 0}
+  .panehead .grow{flex:1;min-width:0}
+  .panehead h2{margin:0 0 4px;font-size:17px;font-weight:700;letter-spacing:-.03em}
+  .panehead .lead{margin:0;font-size:12.5px;color:var(--mute)}
+  .panebox{overflow-y:auto;padding:20px 22px 24px;flex:1}
   .pane{display:none}
   .pane.on{display:block;animation:fade .16s ease}
   @keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
-  .pane h2{margin:0 0 5px;font-size:17px;font-weight:700;letter-spacing:-.03em}
-  .pane .lead{margin:0 0 20px;font-size:12.5px;color:var(--mute)}
-  .panefoot{display:flex;align-items:center;gap:10px;padding:14px 20px;
-    border-top:1px solid var(--line);background:var(--card);
-    border-radius:0 0 var(--r) var(--r)}
-  .panefoot .grow{flex:1;min-width:0}
+  .pane .lead{font-size:12.5px;color:var(--mute)}
 
   /* ---------- controls ---------- */
   label{display:block;font-size:11.5px;font-weight:600;color:var(--sub);margin:0 0 6px}
@@ -79,6 +85,17 @@
   button.ghost:hover{color:#DE4F3C;background:#FDECE9}
   button.dashed{border-style:dashed;border-color:var(--edge);color:var(--sub);border-radius:12px}
   button.dashed:hover{border-color:var(--green);color:var(--green)}
+  button.start{background:var(--card);border:1px solid var(--line);color:var(--sub);
+    border-radius:14px;padding:17px 16px;font-size:14.5px;font-weight:600}
+  button.start:hover{background:#EFF4F2;border-color:var(--green);color:var(--green)}
+  button.selectlike{width:100%;display:flex;align-items:center;justify-content:space-between;
+    background:var(--card);border:1px solid var(--line);border-radius:14px;padding:17px 18px;
+    font-size:14px;font-weight:700;color:var(--ink)}
+  button.selectlike:hover{border-color:var(--green);color:var(--green)}
+  button.selectlike i{font-style:normal;font-size:15px;line-height:1;color:var(--sub);
+    transition:transform .16s ease}
+  button.selectlike.on{border-color:var(--green);color:var(--green)}
+  button.selectlike.on i{transform:rotate(180deg);color:var(--green)}
   button.link{border:none;background:none;padding:0;color:var(--mute);font-size:11.5px}
   button.link:hover{color:var(--green)}
   button:disabled{opacity:.42;cursor:not-allowed}
@@ -103,8 +120,13 @@
   .hcard .meta span{font-size:11.5px;color:var(--mute)}
   .hcard .go{color:var(--mute);font-size:15px}
   .hbox{border:1px solid var(--line);border-radius:14px;background:var(--card);
-    padding:14px;margin-bottom:18px}
-  .hbox .head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+    padding:12px;margin-top:8px}
+  .head{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+  #histSearch{margin-bottom:10px;box-shadow:0 0 0 1px var(--edge) inset}
+  #histList{max-height:300px;overflow-y:auto;padding-right:4px}
+  .hcard.draft{border-style:dashed}
+  .hcard .tag{flex:0 0 auto;font-size:10.5px;font-weight:700;color:var(--green);
+    background:#E7EFEB;border-radius:999px;padding:3px 8px}
   .hbox .head b{font-size:13px;font-weight:700}
   .or{display:flex;align-items:center;gap:10px;margin:16px 0;color:var(--mute);font-size:11.5px}
   .or::before,.or::after{content:"";flex:1;height:1px;background:var(--line)}
@@ -141,13 +163,14 @@
   .hint.on{color:#DE4F3C}
 
   /* ---------- preview ---------- */
-  .preview{background:var(--card);border:1px solid var(--edge);border-radius:var(--r);
+  .preview{background:var(--card);border:1px solid var(--line);border-radius:var(--r);
     padding:18px 20px;height:calc(100vh - 116px);overflow:auto}
   .pvhead{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px}
   .pvhead>span{font-size:12.5px;font-weight:700;color:var(--sub)}
   .zoombar{display:flex;align-items:center;gap:6px}
   .zoombar button{padding:7px 12px;background:#fff}
-  .zoombar b{font-size:12px;font-weight:700;min-width:46px;text-align:center;color:var(--ink)}
+  .zoombar #zoomVal{width:62px;padding:7px 6px;text-align:center;font-size:12px;font-weight:700;
+    border-radius:9px;background:#fff}
   .canvases{display:flex;gap:18px;align-items:flex-start;flex-wrap:nowrap}
   .frame{flex:0 0 auto}
   .frame canvas{display:block;background:#fff;border-radius:6px;
@@ -158,34 +181,46 @@
 
 <div class="topbar">
   <div class="steps">
-    <button class="step on" data-step="1"><i>1</i><div><b>히스토리 (제품 선택)</b><span>제품을 선택해주세요</span></div></button>
+    <button class="step on" data-step="1"><i>1</i><div><b>제품 선택</b><span>불러오거나 새로 시작해주세요</span></div></button>
     <div class="stepline"></div>
     <button class="step" data-step="2"><i>2</i><div><b>썸네일</b><span>썸네일 문구와 이미지를 입력해주세요</span></div></button>
     <div class="stepline"></div>
     <button class="step" data-step="3"><i>3</i><div><b>상세 · 옵션</b><span>상품 옵션과 가격 정보를 입력해주세요</span></div></button>
   </div>
   <div class="topact">
-    <button id="dlThumb" class="mini">썸네일만</button>
-    <button id="dlBoth" class="solid">JPG 출력</button>
+    <button id="dlThumb" class="big">썸네일만</button>
+    <button id="dlBoth" class="solid big">최종본 출력</button>
   </div>
 </div>
 
 <div class="main">
   <div class="panel">
+    <div class="panehead">
+      <div class="grow">
+        <h2 id="paneTitle">1. 제품 선택</h2>
+        <p class="lead" id="paneLead">히스토리에서 불러오거나, 새로 시작해주세요.</p>
+        <p class="hint" id="lockMsg" style="margin:2px 0 0"></p>
+      </div>
+      <button id="prevStep">← 이전</button>
+      <button id="t1Save" class="solid">저장</button>
+      <button id="nextStep" class="solid">다음 →</button>
+      <button id="histSave" hidden></button>
+    </div>
     <div class="panebox">
 
       <!-- ===== STEP 1 ===== -->
       <div class="pane on" data-pane="1">
-        <h2>1. 히스토리 (제품 선택)</h2>
-        <p class="lead">히스토리에서 불러오거나, 새로 제품을 선택해주세요.</p>
-
-        <div class="hbox">
-          <div class="head"><b>히스토리 불러오기</b><button id="histAll" class="link">전체보기 ›</button></div>
-          <div id="histList"></div>
+        <div class="field">
+          <div class="head"><label style="margin:0">히스토리</label>
+            <button id="pEdit" class="link">이름 수정</button></div>
+          <button id="histToggle" class="selectlike">저장된 작업 불러오기<i>▾</i></button>
+          <div id="histPanel" class="hbox" hidden>
+            <input type="text" id="histSearch" placeholder="제품명 검색">
+            <div id="histList"></div>
+          </div>
         </div>
 
-        <div class="field"><label>새로 제품 선택</label>
-          <div class="inline"><select id="histP1"></select><button id="pEdit" class="mini">수정</button></div></div>
+        <select id="histP1" hidden></select>
 
         <div id="pPanel" class="subcard" hidden>
           <div class="field"><label id="pLabel">제품명</label>
@@ -197,16 +232,15 @@
         </div>
 
         <div class="or">또는</div>
-        <button id="histNew" class="wide dashed">＋ 새로 시작하기</button>
+        <button id="histNew" class="wide start">＋ 새로 시작하기</button>
+        <p class="hint">이전에 만든 건 위 목록에서, 신규는 새로 시작하기로 진행하세요.</p>
 
+        <p class="hint" id="histNote"></p>
         <p class="hint" id="connNote"></p>
       </div>
 
       <!-- ===== STEP 2 ===== -->
       <div class="pane" data-pane="2">
-        <h2>2. 썸네일</h2>
-        <p class="lead">메인타이틀 1행이 히스토리 제목이 됩니다.</p>
-
         <div class="field"><label>메인타이틀 1행 (Bold 54)</label>
           <input type="text" id="t1" placeholder="더스트라 더스트 클리너"></div>
         <div class="field"><label>메인타이틀 2행 (Bold 54 · 브랜드 그린)</label>
@@ -228,9 +262,7 @@
 
       <!-- ===== STEP 3 ===== -->
       <div class="pane" data-pane="3">
-        <h2>3. 상세 · 옵션 <span id="optCount" class="lead" style="display:inline"></span></h2>
-        <p class="lead">옵션은 최대 3개까지 추가할 수 있습니다.</p>
-
+        <p class="lead" style="margin:0 0 10px">옵션 <b id="optCount"></b></p>
         <div id="opts"></div>
         <button id="addOpt" class="wide dashed">＋ 옵션 추가</button>
         <p class="hint">텍스트 칸은 비워두면 회색 예시값이 들어갑니다. <b>가격 3칸</b>을 채워야 JPG로 출력됩니다.</p>
@@ -256,24 +288,15 @@
       </div>
 
     </div>
-
-    <div class="panefoot">
-      <div class="grow">
-        <p class="hint" id="histNote" style="margin:0"></p>
-        <p class="hint" id="lockMsg" style="margin:0"></p>
-      </div>
-      <button id="prevStep">← 이전</button>
-      <button id="t1Save" class="solid">저장</button>
-      <button id="nextStep" class="solid">다음 →</button>
-      <button id="histSave" hidden></button>
-    </div>
   </div>
+
+  <div class="grip" id="grip" title="드래그해서 폭 조절"></div>
 
   <div class="preview" id="stage">
     <div class="pvhead">
       <span>미리보기</span>
       <div class="zoombar">
-        <button id="zoomOut">−</button><b id="zoomVal">100%</b><button id="zoomIn">＋</button>
+        <button id="zoomOut">−</button><input type="text" id="zoomVal" value="100%"><button id="zoomIn">＋</button>
         <button id="zoomFit">화면 맞춤</button>
       </div>
     </div>
@@ -480,7 +503,7 @@ document.addEventListener('click',e=>{
   const card=e.target.closest('[data-load]');
   if(card){ const id=card.dataset.load;
     fillProducts(id); $('histP1').value=id; applyProductPlaceholders();
-    loadSaved(id).then(()=>goStep(2)); return; }
+    openHist(false); loadSaved(id).then(()=>goStep(2)); return; }
   const d=e.target.closest('[data-drop]');
   if(d){ const i=+d.dataset.drop;
     pick(im=>normalize(im,IMG_W,IMG_H,n=>{opts[i].img=n; renderOpts(); draw();})); return; }
@@ -822,6 +845,10 @@ async function initProducts(){
   $('pName').addEventListener('input',syncPrimary);
   $('pPrimary').onclick=()=>{ pMode==='add' ? doAdd() : doRename(); };
   $('pCancel').onclick=closePanel;
+  $('histNew').onclick=()=>{                 // 신규 작업은 제품명을 먼저 정하고 시작합니다
+    $('histP1').value=''; applyProductPlaceholders(); resetWork();
+    openPanel('add'); renderHist();
+  };
   $('pEdit').onclick=()=>{
     if($('pPanel').hidden===false){ closePanel(); return; }
     if(!curId()){ alert('수정할 제품을 먼저 선택해 주세요.'); return; }
@@ -862,9 +889,9 @@ async function initProducts(){
 
     if(hadRecord){                      // 저장된 기록이 있으면 새로 시작하지 않고 불러옵니다
       alert('"'+n+'" 은 저장된 작업이 있어 기존 내용을 불러옵니다.');
-      await loadSaved(np.id);
+      await loadSaved(np.id); goStep(2);
     }else{
-      resetWork(); renderHist();
+      resetWork(); $('t1').value=n; await renderHist(); draw(); goStep(2);
     }
   }
   $('pDel').onclick=async()=>{
@@ -907,16 +934,23 @@ const PV=new Map();                 // 제품ID → 미리보기 data URL
 async function drawHistCards(list){
   const box=$('histList');
   if(!box) return;
+  const q=$('histSearch').value.trim().toLowerCase();
   const rows=list.slice().sort((a,b)=>(b.ts||0)-(a.ts||0));
-  const show=$('histAll').dataset.all ? rows : rows.slice(0,3);
+
+  // 아직 저장 전인 작업도 카드로 보여줍니다
+  const cur=curId();
+  const draft = (cur && !SAVED.has(cur))
+    ? [{id:cur,name:curName(),date:'저장 전',draft:true}] : [];
+
+  const show=draft.concat(rows).filter(r=>!q || r.name.toLowerCase().includes(q));
+
   box.innerHTML = show.length ? show.map(r=>
-      '<div class="hcard" data-load="'+esc(r.id)+'">'
+      '<div class="hcard'+(r.draft?' draft':'')+'" data-load="'+esc(r.id)+'">'
       +'<div class="thumb">'+(PV.get(r.id)?'<img src="'+PV.get(r.id)+'">':'<span>없음</span>')+'</div>'
       +'<div class="meta"><b>'+esc(r.name)+'</b><span>'+esc(r.date||'')+'</span></div>'
-      +'<div class="go">›</div></div>').join('')
-    : '<p class="hint" style="margin:0">저장된 작업이 없습니다. 아래에서 제품을 고르거나 새로 시작하세요.</p>';
-  $('histAll').textContent = $('histAll').dataset.all ? '접기 ‹' : '전체보기 ›';
-  $('histAll').hidden = rows.length<=3;
+      +(r.draft?'<div class="tag">작업 중</div>':'<div class="go">›</div>')+'</div>').join('')
+    : '<p class="hint" style="margin:0">'
+      +(q?'검색 결과가 없습니다.':'저장된 작업이 없습니다. 아래 새로 시작하기로 만들어 보세요.')+'</p>';
 
   for(const r of show){                       // 미리보기는 뒤에서 채워 넣습니다
     if(!r.preview || PV.has(r.id)) continue;
@@ -952,27 +986,31 @@ $('histSave').onclick=async()=>{
     renderHist();
   });
 };
-$('histNew').onclick=()=>{
-  if(!confirm('현재 입력을 모두 비우고 새로 시작할까요?')) return;
-  GIDS.forEach(id=>$(id).value='');
-  $('histP1').value=''; $('pName').value=''; $('pPanel').hidden=true;
-  resetWork(); applyProductPlaceholders(); renderHist();
-  renderOpts(); draw();
-};
+
 function save(cv,name){ cv.toBlob(b=>{
   const a=document.createElement('a'); a.href=URL.createObjectURL(b); a.download=name; a.click();
   setTimeout(()=>URL.revokeObjectURL(a.href),1000);
 },'image/jpeg',0.95); }
-$('dlThumb').onclick=()=>save($('cT'),'thumbnail_528x659.jpg');
-$('dlBoth').onclick=()=>{ save($('cT'),'thumbnail_528x659.jpg');
-  setTimeout(()=>save($('cD'),'detail_860x'+detailHeight()+'.jpg'),350); };
+$('dlThumb').onclick=()=>{
+  if(missing().length){ flagLock(); return; }
+  save($('cT'),'thumbnail_528x659.jpg');
+};
+$('dlBoth').onclick=()=>{
+  if(missing().length){ flagLock(); return; }
+  save($('cT'),'thumbnail_528x659.jpg');
+  setTimeout(()=>save($('cD'),'detail_860x'+detailHeight()+'.jpg'),350);
+  setTimeout(()=>quickSave(true),700);      // 출력하면 히스토리에도 자동 저장
+};
 
+let LOCK_SHOWN=false;                 // 저장·출력을 눌러본 뒤에만 안내를 띄웁니다
 function updateLock(){
-  const miss=missing(), ok=miss.length===0;
-  $('dlBoth').disabled=!ok; $('dlThumb').disabled=!ok;
-  $('lockMsg').textContent = ok ? '' : miss.join(', ')+' 의 정상가·할인가·비밀 할인가를 입력하면 저장할 수 있습니다.';
-  $('lockMsg').classList.toggle('on',!ok);
+  const bad=missing().length>0;
+  if(!bad) LOCK_SHOWN=false;
+  const show=bad&&LOCK_SHOWN;
+  $('lockMsg').textContent = show ? '정상가·할인가·비밀 할인가를 입력해 주세요.' : '';
+  $('lockMsg').classList.toggle('on',show);
 }
+function flagLock(){ LOCK_SHOWN=true; updateLock(); }
 async function copyText(t,btn){
   try{ await navigator.clipboard.writeText(t); }
   catch(e){ const ta=document.createElement('textarea'); ta.value=t; document.body.appendChild(ta);
@@ -983,7 +1021,7 @@ function applyZoom(z){
   z=Math.max(.15,Math.min(1,z));
   $('cT').style.width=Math.round(528*z)+'px';
   $('cD').style.width=Math.round(860*z)+'px';
-  $('zoomVal').textContent=Math.round(z*100)+'%';
+  $('zoomVal').value=Math.round(z*100)+'%';
   $('pvZoom').value=Math.round(z*100);
 }
 function fitZoom(){
@@ -1010,9 +1048,9 @@ async function busy(btn,label,fn){
 }
 
 /* 메인타이틀 1행 이름으로 바로 저장 — 신규 건은 제품 목록을 거치지 않아도 됩니다 */
-async function quickSave(){
+async function quickSave(silent){
   const nm=V('t1').trim();
-  if(!nm){ alert('메인타이틀 1행을 먼저 입력해 주세요.'); return; }
+  if(!nm){ if(!silent) alert('메인타이틀 1행을 먼저 입력해 주세요.'); return; }
   // 가격은 저장 조건이 아닙니다 — 이미지·문구만 먼저 저장해두고 나중에 채울 수 있습니다
 
   let prod=PRODUCTS.find(p=>p.name===nm);
@@ -1021,10 +1059,11 @@ async function quickSave(){
     PRODUCTS.push(prod); PRODUCTS.sort((a,b)=>a.name.localeCompare(b.name,'ko'));
     try{ await Store.setProducts(PRODUCTS); }
     catch(e){ alert('제품 등록에 실패했습니다.\n'+e.message); return; }
-  }else if(SAVED.has(prod.id) &&
+  }else if(!silent && SAVED.has(prod.id) &&
     !confirm('"'+nm+'" 기록이 이미 있습니다.\n덮어쓸까요?')) return;
 
   const btn=$('t1Save');
+  if(missing().length) flagLock();     // 저장은 되지만 가격이 비었음을 알려줍니다
   await busy(btn,'저장',async()=>{
     await Store.put({id:prod.id,name:nm,date:stamp(),ts:Date.now(),data:snapshot()});
     fillProducts(prod.id); $('histP1').value=prod.id;
@@ -1035,8 +1074,15 @@ $('t1Save').onclick=quickSave;
 
 /* ---------- 단계 이동 ---------- */
 let STEP=1;
+const STEP_TXT={
+  1:['1. 제품 선택','히스토리에서 불러오거나, 새로 시작해주세요.'],
+  2:['2. 썸네일','제품명은 메인타이틀 1행입니다.'],
+  3:['3. 상세 · 옵션','옵션은 최대 3개까지 추가할 수 있습니다.']
+};
 function goStep(n){
   STEP=Math.max(1,Math.min(3,n));
+  $('paneTitle').textContent=STEP_TXT[STEP][0];
+  $('paneLead').textContent=STEP_TXT[STEP][1];
   document.querySelectorAll('.pane').forEach(el=>el.classList.toggle('on',+el.dataset.pane===STEP));
   document.querySelectorAll('.step').forEach(el=>{
     const s=+el.dataset.step;
@@ -1048,15 +1094,54 @@ function goStep(n){
   document.querySelector('.panebox').scrollTop=0;
 }
 document.querySelectorAll('.step').forEach(el=>el.onclick=()=>goStep(+el.dataset.step));
+
+/* ---------- 좌우 폭 조절 ---------- */
+(function(){
+  const grip=$('grip'); let on=false;
+  const move=e=>{
+    if(!on) return;
+    const x=(e.touches?e.touches[0].clientX:e.clientX)-26;
+    const w=Math.max(340,Math.min(760,x));
+    document.documentElement.style.setProperty('--panelw',w+'px');
+    if(window.__fitMode) fitZoom();
+    e.preventDefault();
+  };
+  const stop=()=>{ on=false; grip.classList.remove('on'); document.body.style.userSelect=''; };
+  grip.addEventListener('mousedown',e=>{ on=true; grip.classList.add('on');
+    document.body.style.userSelect='none'; e.preventDefault(); });
+  grip.addEventListener('touchstart',e=>{ on=true; grip.classList.add('on'); },{passive:true});
+  window.addEventListener('mousemove',move);
+  window.addEventListener('touchmove',move,{passive:false});
+  window.addEventListener('mouseup',stop); window.addEventListener('touchend',stop);
+  grip.addEventListener('dblclick',()=>{                 // 더블클릭하면 기본 폭
+    document.documentElement.style.setProperty('--panelw','460px');
+    if(window.__fitMode) fitZoom();
+  });
+})();
 $('prevStep').onclick=()=>goStep(STEP-1);
 $('nextStep').onclick=()=>goStep(STEP+1);
-$('histAll').onclick=()=>{
-  const a=$('histAll');
-  if(a.dataset.all) delete a.dataset.all; else a.dataset.all='1';
-  renderHist();
+function openHist(on){
+  $('histPanel').hidden=!on;
+  $('histToggle').classList.toggle('on',on);
+  if(on){ renderHist(); if(!$('histSearch').hidden) $('histSearch').focus(); }
+}
+$('histToggle').onclick=()=>openHist($('histPanel').hidden);
+$('histSearch').addEventListener('input',()=>renderHist());
+const stepZoom=d=>{                        // ＋ − 는 10% 단위로 딱 떨어지게
+  const cur=+$('pvZoom').value;
+  const next=(d>0 ? Math.floor(cur/10)+1 : Math.ceil(cur/10)-1)*10;
+  window.__fitMode=false; applyZoom(next/100);
 };
-$('zoomIn').onclick=()=>applyZoom(+$('pvZoom').value/100+.1);
-$('zoomOut').onclick=()=>applyZoom(+$('pvZoom').value/100-.1);
+$('zoomIn').onclick=()=>stepZoom(1);
+$('zoomOut').onclick=()=>stepZoom(-1);
+function commitZoom(){
+  const v=parseInt($('zoomVal').value.replace(/[^0-9]/g,''),10);
+  window.__fitMode=false;
+  applyZoom(isNaN(v)? +$('pvZoom').value/100 : v/100);
+}
+$('zoomVal').addEventListener('change',commitZoom);
+$('zoomVal').addEventListener('keydown',e=>{ if(e.key==='Enter'){ commitZoom(); e.target.blur(); } });
+$('zoomVal').addEventListener('focus',e=>e.target.select());
 
 function draw(){ drawThumb(); drawDetail(); updateLock(); }
 fillProducts();                         // 목록을 먼저 채운 뒤 저장소를 조회합니다
