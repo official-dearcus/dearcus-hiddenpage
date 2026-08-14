@@ -6,77 +6,116 @@
   :root{
     --green:#2D4A3E; --green-deep:#1E332B; --yellow:#F6DE4A;
     --ink:#191F28; --sub:#4E5968; --mute:#B4BBC3;
-    --line:#F2F4F6; --card:#F9FAFB; --chip:#F2F4F6; --paper:#FFFFFF;
-    --r:14px;
+    --line:#F2F4F6; --edge:#E5E8EB; --card:#F9FAFB; --chip:#F2F4F6; --paper:#FFFFFF;
+    --r:16px;
   }
   *{box-sizing:border-box}
   [hidden]{display:none!important}
   body{margin:0;background:var(--paper);color:var(--ink);
     font-family:Pretendard,-apple-system,BlinkMacSystemFont,system-ui,sans-serif;font-size:14px;
     -webkit-font-smoothing:antialiased}
-  .wrap{display:grid;grid-template-columns:432px 1fr;min-height:100vh}
 
-  /* ---------- editor ---------- */
-  .editor{background:var(--paper);border-right:1px solid var(--line);overflow-y:auto;height:100vh;
-    padding-bottom:28px}
-  .brand{padding:26px 22px 18px}
-  .brand h1{margin:0;font-size:20px;font-weight:800;letter-spacing:-.03em}
-  .brand p{margin:6px 0 0;font-size:12.5px;color:var(--mute)}
-
-  .sec{margin:0 18px 14px;background:var(--card);border:1px solid var(--line);
-    border-radius:var(--r);padding:20px}
-  .sec>h2,details.fold>summary{display:flex;align-items:center;gap:9px;margin:0 0 16px;
-    font-size:14.5px;font-weight:700;letter-spacing:-.02em;color:var(--ink)}
-  .sec>h2 i,details.fold>summary i{font-style:normal;flex:0 0 auto;width:20px;height:20px;
-    border-radius:6px;background:var(--chip);color:var(--sub);font-size:11px;font-weight:700;
+  /* ---------- top bar ---------- */
+  .topbar{display:flex;align-items:center;gap:20px;padding:18px 26px;flex-wrap:wrap}
+  .steps{display:flex;align-items:center;gap:6px;flex:1;min-width:0}
+  .step{display:flex;align-items:center;gap:11px;border:none;background:transparent;
+    padding:8px 12px;border-radius:12px;cursor:pointer;font-family:inherit;text-align:left}
+  .step:hover{background:var(--chip)}
+  .step i{flex:0 0 auto;width:30px;height:30px;border-radius:50%;background:var(--chip);
+    color:var(--mute);font-style:normal;font-size:13px;font-weight:700;
     display:flex;align-items:center;justify-content:center}
-  .sec>h2 span{font-weight:500;color:var(--mute);font-size:12px}
+  .step b{display:block;font-size:13.5px;font-weight:700;color:var(--mute);letter-spacing:-.02em}
+  .step span{display:block;font-size:11.5px;color:var(--mute);margin-top:1px}
+  .step.on i{background:var(--green);color:#fff}
+  .step.on b{color:var(--ink)}
+  .step.on span{color:var(--sub)}
+  .step.done i{background:#DCE5E1;color:var(--green)}
+  .step.done b{color:var(--sub)}
+  .stepline{width:34px;height:1px;background:var(--edge);flex:0 0 auto}
+  .topact{display:flex;align-items:center;gap:8px}
 
-  details.fold>summary{cursor:pointer;list-style:none;margin:0}
-  details.fold>summary::-webkit-details-marker{display:none}
-  details.fold>summary::after{content:"▾";margin-left:auto;color:var(--mute);font-size:11px}
-  details.fold[open]>summary::after{content:"▴"}
-  details.fold[open]>summary{margin-bottom:16px}
-  .foldbody{animation:fade .18s ease}
-  @keyframes fade{from{opacity:0;transform:translateY(-3px)}to{opacity:1;transform:none}}
+  /* ---------- layout ---------- */
+  .main{display:grid;grid-template-columns:460px 1fr;gap:18px;padding:0 26px 26px;
+    align-items:start}
+  .panel{background:var(--paper);border:1px solid var(--edge);border-radius:var(--r);
+    display:flex;flex-direction:column;height:calc(100vh - 116px)}
+  .panebox{overflow-y:auto;padding:24px;flex:1}
+  .pane{display:none}
+  .pane.on{display:block;animation:fade .16s ease}
+  @keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+  .pane h2{margin:0 0 5px;font-size:17px;font-weight:700;letter-spacing:-.03em}
+  .pane .lead{margin:0 0 20px;font-size:12.5px;color:var(--mute)}
+  .panefoot{display:flex;align-items:center;gap:10px;padding:14px 20px;
+    border-top:1px solid var(--line);background:var(--card);
+    border-radius:0 0 var(--r) var(--r)}
+  .panefoot .grow{flex:1;min-width:0}
 
+  /* ---------- controls ---------- */
   label{display:block;font-size:11.5px;font-weight:600;color:var(--sub);margin:0 0 6px}
-  input[type=text],input[type=number],select,textarea{width:100%;padding:10px 12px;border:1px solid transparent;
-    border-radius:10px;font-family:inherit;font-size:13.5px;background:#FFFFFF;color:var(--ink);
-    box-shadow:0 0 0 1px var(--line) inset}
+  input[type=text],input[type=number],select,textarea{width:100%;padding:11px 13px;
+    border:1px solid transparent;border-radius:11px;font-family:inherit;font-size:13.5px;
+    background:#fff;color:var(--ink);box-shadow:0 0 0 1px var(--edge) inset}
   input::placeholder{color:var(--mute)}
   input:focus,select:focus,textarea:focus{outline:none;box-shadow:0 0 0 2px var(--green) inset}
   select:disabled{background:var(--chip);color:var(--mute)}
   #histP1 option[value="__add__"]{font-weight:700;color:var(--green)}
-  .field{margin-bottom:14px}
+  .field{margin-bottom:16px}
   .row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
   .row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px}
   .inline{display:flex;gap:6px;align-items:center}
   .inline input,.inline select{flex:1;min-width:0}
-  .subcard{background:#FFFFFF;border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:14px}
+  .subcard{background:var(--card);border:1px solid var(--line);border-radius:12px;
+    padding:15px;margin-bottom:16px}
 
-  button{font-family:inherit;cursor:pointer;border-radius:999px;border:1px solid var(--line);
-    background:#FFFFFF;padding:9px 15px;font-size:12.5px;font-weight:600;color:var(--sub);
+  button{font-family:inherit;cursor:pointer;border-radius:999px;border:1px solid var(--edge);
+    background:#fff;padding:10px 16px;font-size:12.5px;font-weight:600;color:var(--sub);
     transition:.14s ease;white-space:nowrap}
   button:hover{border-color:var(--green);color:var(--green)}
   button.solid{background:var(--green);border-color:var(--green);color:#fff}
   button.solid:hover{background:var(--green-deep);color:#fff}
-  button.mini{padding:9px 14px;flex:0 0 auto}
-  button.wide{width:100%;padding:11px 15px}
-  .prow{margin-top:10px}
-  .prow.one{grid-template-columns:1fr}
+  button.mini{padding:10px 14px;flex:0 0 auto}
+  button.wide{width:100%;padding:12px 16px}
   button.ghost{border-color:transparent;background:var(--chip);color:var(--mute)}
   button.ghost:hover{color:#DE4F3C;background:#FDECE9}
+  button.dashed{border-style:dashed;border-color:var(--edge);color:var(--sub);border-radius:12px}
+  button.dashed:hover{border-color:var(--green);color:var(--green)}
+  button.link{border:none;background:none;padding:0;color:var(--mute);font-size:11.5px}
+  button.link:hover{color:var(--green)}
   button:disabled{opacity:.42;cursor:not-allowed}
-  button:disabled:hover{border-color:var(--line);color:var(--sub)}
+  button:disabled:hover{border-color:var(--edge);color:var(--sub)}
+  button.path{width:100%;margin-top:8px;background:var(--chip);border-color:transparent;
+    font-size:11.5px;color:var(--sub);border-radius:11px;padding:10px 12px}
+  button.path:hover{background:var(--green);color:#fff}
+  .prow{margin-top:10px}
+  .prow.one{grid-template-columns:1fr}
 
-  .drop{border:1.5px dashed #E2E6EA;border-radius:12px;padding:22px 14px;text-align:center;
-    cursor:pointer;font-size:12.5px;color:var(--mute);background:#FFFFFF}
+  /* ---------- history cards ---------- */
+  .hcard{display:flex;align-items:center;gap:12px;padding:10px;border:1px solid var(--edge);
+    border-radius:12px;background:#fff;margin-bottom:8px;cursor:pointer;transition:.14s}
+  .hcard:hover{border-color:var(--green);background:#FAFCFB}
+  .hcard .thumb{flex:0 0 auto;width:46px;height:57px;border-radius:7px;overflow:hidden;
+    background:var(--chip);display:flex;align-items:center;justify-content:center}
+  .hcard .thumb img{width:100%;height:100%;object-fit:cover;display:block}
+  .hcard .thumb span{font-size:9px;color:var(--mute)}
+  .hcard .meta{flex:1;min-width:0}
+  .hcard .meta b{display:block;font-size:13px;font-weight:700;
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .hcard .meta span{font-size:11.5px;color:var(--mute)}
+  .hcard .go{color:var(--mute);font-size:15px}
+  .hbox{border:1px solid var(--line);border-radius:14px;background:var(--card);
+    padding:14px;margin-bottom:18px}
+  .hbox .head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+  .hbox .head b{font-size:13px;font-weight:700}
+  .or{display:flex;align-items:center;gap:10px;margin:16px 0;color:var(--mute);font-size:11.5px}
+  .or::before,.or::after{content:"";flex:1;height:1px;background:var(--line)}
+
+  .drop{border:1.5px dashed var(--edge);border-radius:12px;padding:22px 14px;text-align:center;
+    cursor:pointer;font-size:12.5px;color:var(--mute);background:#fff}
   .drop:hover{border-color:var(--green);color:var(--green)}
-  .drop.has{padding:8px;border-style:solid;border-color:var(--line);background:#fff}
+  .drop.has{padding:8px;border-style:solid;border-color:var(--edge)}
   .drop.has img{display:block;width:auto;max-width:100%;height:150px;margin:0 auto;
     object-fit:contain;border-radius:8px}
-  #cCrop{width:100%;height:auto;display:block;border-radius:12px;border:1px solid var(--line);
+  #cCrop{width:100%;height:auto;display:block;border-radius:12px;border:1px solid var(--edge);
     cursor:grab;background:var(--chip);touch-action:none}
   #cCrop:active{cursor:grabbing}
   #cropBox input[type=range]{width:100%;margin:12px 0 10px;accent-color:var(--green)}
@@ -84,56 +123,68 @@
     padding:16px;border:none;border-radius:12px;cursor:pointer}
   #dropLogo img{height:34px;width:auto;object-fit:contain}
 
-  .opt{border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:10px;background:#FFFFFF}
+  .opt{border:1px solid var(--edge);border-radius:13px;padding:16px;margin-bottom:10px;background:#fff}
   .opt header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
   .opt header b{font-size:12.5px;color:var(--ink);display:flex;align-items:center}
   .rate{display:inline-block;background:var(--green);color:#fff;border-radius:999px;
     padding:3px 10px;font-size:11px;font-weight:700;margin-left:7px}
 
-  .hist{display:flex;align-items:center;justify-content:space-between;gap:8px;
-    border:1px solid var(--line);border-radius:12px;padding:11px 13px;margin-top:8px;background:#FFFFFF}
-  .hist b{display:block;font-size:12.5px;font-weight:700}
-  .hist span{font-size:11px;color:var(--mute)}
-  .hist .btns{display:flex;gap:4px;flex-shrink:0}
-  .hist button{padding:7px 11px;font-size:11.5px}
+  details.fold>summary{cursor:pointer;list-style:none;display:flex;align-items:center;
+    font-size:13px;font-weight:700;color:var(--ink)}
+  details.fold>summary::-webkit-details-marker{display:none}
+  details.fold>summary::after{content:"▾";margin-left:auto;color:var(--mute);font-size:11px}
+  details.fold[open]>summary::after{content:"▴"}
+  details.fold[open]>summary{margin-bottom:16px}
+  details.fold{border-top:1px solid var(--line);padding-top:18px;margin-top:20px}
 
-  button.path{width:100%;margin-top:8px;background:var(--chip);border-color:transparent;
-    font-size:11.5px;color:var(--sub);border-radius:10px;padding:9px 12px}
-  button.path:hover{background:var(--green);color:#fff}
   .hint{font-size:11.5px;color:var(--mute);line-height:1.7;margin:8px 0 0}
-  .lock{margin:0;padding:0 22px;font-size:11.5px;line-height:1.6;color:var(--mute)}
-  .lock.on{color:#DE4F3C;padding-top:4px}
-  .actions{display:flex;gap:8px;padding:14px 22px 0}
-  .actions button{flex:1;padding:13px 15px;font-size:13.5px}
+  .hint.on{color:#DE4F3C}
 
   /* ---------- preview ---------- */
-  .stage{padding:26px 28px;overflow-y:auto;height:100vh;background:var(--paper)}
-    .zoombar{display:flex;align-items:center;gap:12px;margin-bottom:18px;
-    background:var(--chip);border-radius:999px;padding:8px 8px 8px 18px;width:max-content}
-  .zoombar span{font-size:12px;font-weight:600;color:var(--sub)}
-  .zoombar b{font-size:12px;font-weight:700;color:var(--ink);min-width:38px;text-align:right}
-  .zoombar input[type=range]{width:160px;accent-color:var(--green)}
-  .canvases{display:flex;gap:20px;align-items:flex-start;flex-wrap:nowrap;
-    overflow-x:auto;padding-bottom:10px}
-  .frame{background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:16px;
-    flex:0 0 auto}
-  .frame h3{margin:0 0 12px;font-size:11px;font-weight:700;letter-spacing:.1em;color:var(--mute)}
-  .frame canvas{display:block;max-width:100%;height:auto;border-radius:4px;
-    box-shadow:0 2px 14px rgba(25,31,40,.07)}
+  .preview{background:var(--card);border:1px solid var(--edge);border-radius:var(--r);
+    padding:18px 20px;height:calc(100vh - 116px);overflow:auto}
+  .pvhead{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px}
+  .pvhead>span{font-size:12.5px;font-weight:700;color:var(--sub)}
+  .zoombar{display:flex;align-items:center;gap:6px}
+  .zoombar button{padding:7px 12px;background:#fff}
+  .zoombar b{font-size:12px;font-weight:700;min-width:46px;text-align:center;color:var(--ink)}
+  .canvases{display:flex;gap:18px;align-items:flex-start;flex-wrap:nowrap}
+  .frame{flex:0 0 auto}
+  .frame canvas{display:block;background:#fff;border-radius:6px;
+    box-shadow:0 2px 16px rgba(25,31,40,.09)}
+  .frame p{margin:9px 0 0;font-size:10.5px;font-weight:700;letter-spacing:.08em;
+    color:var(--mute);text-align:center}
 </style>
 
-<div class="wrap">
-<div class="editor">
-  <div class="brand">
-    <h1>히든페이지 스튜디오</h1>
-    <p>썸네일 528×659 · 상세 860×가변 · 할인율 자동 계산</p>
+<div class="topbar">
+  <div class="steps">
+    <button class="step on" data-step="1"><i>1</i><div><b>히스토리 (제품 선택)</b><span>제품을 선택해주세요</span></div></button>
+    <div class="stepline"></div>
+    <button class="step" data-step="2"><i>2</i><div><b>썸네일</b><span>썸네일 문구와 이미지를 입력해주세요</span></div></button>
+    <div class="stepline"></div>
+    <button class="step" data-step="3"><i>3</i><div><b>상세 · 옵션</b><span>상품 옵션과 가격 정보를 입력해주세요</span></div></button>
   </div>
+  <div class="topact">
+    <button id="dlThumb" class="mini">썸네일만</button>
+    <button id="dlBoth" class="solid">JPG 출력</button>
+  </div>
+</div>
 
-  <div class="sec">
-    <details class="fold" id="histFold">
-      <summary><i>1</i>히스토리</summary>
-      <div class="foldbody">
-        <div class="field"><label>히스토리 선택</label>
+<div class="main">
+  <div class="panel">
+    <div class="panebox">
+
+      <!-- ===== STEP 1 ===== -->
+      <div class="pane on" data-pane="1">
+        <h2>1. 히스토리 (제품 선택)</h2>
+        <p class="lead">히스토리에서 불러오거나, 새로 제품을 선택해주세요.</p>
+
+        <div class="hbox">
+          <div class="head"><b>히스토리 불러오기</b><button id="histAll" class="link">전체보기 ›</button></div>
+          <div id="histList"></div>
+        </div>
+
+        <div class="field"><label>새로 제품 선택</label>
           <div class="inline"><select id="histP1"></select><button id="pEdit" class="mini">수정</button></div></div>
 
         <div id="pPanel" class="subcard" hidden>
@@ -145,81 +196,95 @@
           <p class="hint" id="pHint"></p>
         </div>
 
-        <div class="row"><button id="histSave" class="solid">현재 설정 저장</button><button id="histNew">새로 시작</button></div>
-        <p class="hint" id="histNote"></p>
+        <div class="or">또는</div>
+        <button id="histNew" class="wide dashed">＋ 새로 시작하기</button>
+
         <p class="hint" id="connNote"></p>
-        <p class="hint">같은 제품으로 저장하면 기존 기록을 덮어씁니다. 제품당 1건만 남습니다.</p>
       </div>
-    </details>
-  </div>
 
-  <div class="sec">
-    <h2><i>2</i>썸네일</h2>
-    <div class="field"><label>메인타이틀 1행 (Bold 54) · 히스토리 제목</label>
-      <div class="inline"><input type="text" id="t1" placeholder="더스트라 더스트 클리너">
-        <button id="t1Save" class="mini" title="이 이름으로 히스토리에 저장">저장</button></div></div>
-    <div class="field"><label>메인타이틀 2행 (Bold 54 · 브랜드 그린)</label>
-      <input type="text" id="t2" placeholder="시크릿 특가"></div>
-    <div class="field"><label>서브타이틀 앞부분 (Regular 22)</label>
-      <input type="text" id="sub" placeholder="오직 여기서만, 더스트라 더스트 클리너"></div>
-    <div class="field"><label>연출컷 528×400 · 드래그로 위치, 슬라이더로 확대</label>
-      <div class="drop" id="dropThumb">클릭해서 이미지 선택</div>
-      <div id="cropBox" hidden>
-        <canvas id="cCrop" width="348" height="264"></canvas>
-        <input type="range" id="zoom" min="100" max="280" value="100">
-        <div class="row"><button id="cropReset">가운데 정렬</button><button id="cropChange">이미지 변경</button></div>
+      <!-- ===== STEP 2 ===== -->
+      <div class="pane" data-pane="2">
+        <h2>2. 썸네일</h2>
+        <p class="lead">메인타이틀 1행이 히스토리 제목이 됩니다.</p>
+
+        <div class="field"><label>메인타이틀 1행 (Bold 54)</label>
+          <input type="text" id="t1" placeholder="더스트라 더스트 클리너"></div>
+        <div class="field"><label>메인타이틀 2행 (Bold 54 · 브랜드 그린)</label>
+          <input type="text" id="t2" placeholder="시크릿 특가"></div>
+        <div class="field"><label>서브타이틀 앞부분 (Regular 22)</label>
+          <input type="text" id="sub" placeholder="오직 여기서만, 더스트라 더스트 클리너"></div>
+
+        <div class="field"><label>연출컷 528×400 · 드래그로 위치, 슬라이더로 확대</label>
+          <div class="drop" id="dropThumb">클릭해서 이미지 선택</div>
+          <div id="cropBox" hidden>
+            <canvas id="cCrop" width="348" height="264"></canvas>
+            <input type="range" id="zoom" min="100" max="280" value="100">
+            <div class="row"><button id="cropReset">가운데 정렬</button><button id="cropChange">이미지 변경</button></div>
+          </div>
+          <button class="path" data-copypath="1">이미지 경로 복사</button></div>
+
+        <p class="hint">서브타이틀 끝의 <b>UP TO 00%</b>는 옵션 중 최대 할인율로 자동 입력됩니다.</p>
       </div>
-      <button class="path" data-copypath="1">이미지 경로 복사</button></div>
-    <p class="hint">서브타이틀 끝의 <b>UP TO 00%</b>는 옵션 중 최대 할인율로 자동 입력됩니다.</p>
-  </div>
 
-  <div class="sec">
-    <h2><i>3</i>상세 · 옵션 <span id="optCount"></span></h2>
-    <div id="opts"></div>
-    <button id="addOpt">＋ 옵션 추가</button>
-    <p class="hint">텍스트 칸은 비워두면 회색 예시값이 들어갑니다. <b>가격 3칸은 반드시 입력</b>해야 저장됩니다.</p>
-  </div>
+      <!-- ===== STEP 3 ===== -->
+      <div class="pane" data-pane="3">
+        <h2>3. 상세 · 옵션 <span id="optCount" class="lead" style="display:inline"></span></h2>
+        <p class="lead">옵션은 최대 3개까지 추가할 수 있습니다.</p>
 
-  <div class="sec">
-    <details class="fold">
-      <summary><i>4</i>상단 고정 안내 문구</summary>
-      <div>
-        <div class="field"><label>상단 라벨</label><input type="text" id="g0" placeholder="주의"></div>
-        <div class="field"><label>헤드라인 1행</label><input type="text" id="g1" placeholder="이 페이지를 나가면"></div>
-        <div class="field"><label>헤드라인 2행 (옐로우)</label><input type="text" id="g2" placeholder="할인이 불가능합니다."></div>
-        <div class="field"><label>설명 1행</label><input type="text" id="g3" placeholder="비정상적가격 할인행사 시 재판매유통 피해를 막기 위해"></div>
-        <div class="field"><label>설명 2행</label><input type="text" id="g4" placeholder="본 링크에서만 할인가 구매가 가능합니다."></div>
-        <div class="field"><label>NOTICE 1행</label><input type="text" id="g5" placeholder="링크 저장 없이 페이지 이탈 시 재접속이 불가하오니 참고바랍니다."></div>
-        <div class="field"><label>NOTICE 2행</label><input type="text" id="g6" placeholder="국내 및 해외 모든 판매처중 가장 압도적인 혜택이 적용되어 있습니다."></div>
-        <div class="field"><label>브랜드 로고 이미지 (클릭해서 교체)</label>
-          <div class="drop has" id="dropLogo"></div></div>
-        <div class="row">
-          <div class="field"><label>섹션 타이틀</label><input type="text" id="g8" placeholder="비밀링크 할인가 안내"></div>
-          <div class="field"><label>섹션 설명</label><input type="text" id="g9" placeholder="이 페이지에서만 할인가로 구매할 수 있습니다."></div>
-        </div>
+        <div id="opts"></div>
+        <button id="addOpt" class="wide dashed">＋ 옵션 추가</button>
+        <p class="hint">텍스트 칸은 비워두면 회색 예시값이 들어갑니다. <b>가격 3칸</b>을 채워야 JPG로 출력됩니다.</p>
+
+        <details class="fold">
+          <summary>상단 고정 안내 문구</summary>
+          <div>
+            <div class="field"><label>상단 라벨</label><input type="text" id="g0" placeholder="주의"></div>
+            <div class="field"><label>헤드라인 1행</label><input type="text" id="g1" placeholder="이 페이지를 나가면"></div>
+            <div class="field"><label>헤드라인 2행 (옐로우)</label><input type="text" id="g2" placeholder="할인이 불가능합니다."></div>
+            <div class="field"><label>설명 1행</label><input type="text" id="g3" placeholder="비정상적가격 할인행사 시 재판매유통 피해를 막기 위해"></div>
+            <div class="field"><label>설명 2행</label><input type="text" id="g4" placeholder="본 링크에서만 할인가 구매가 가능합니다."></div>
+            <div class="field"><label>NOTICE 1행</label><input type="text" id="g5" placeholder="링크 저장 없이 페이지 이탈 시 재접속이 불가하오니 참고바랍니다."></div>
+            <div class="field"><label>NOTICE 2행</label><input type="text" id="g6" placeholder="국내 및 해외 모든 판매처중 가장 압도적인 혜택이 적용되어 있습니다."></div>
+            <div class="field"><label>브랜드 로고 이미지 (클릭해서 교체)</label>
+              <div class="drop has" id="dropLogo"></div></div>
+            <div class="row">
+              <div class="field"><label>섹션 타이틀</label><input type="text" id="g8" placeholder="비밀링크 할인가 안내"></div>
+              <div class="field"><label>섹션 설명</label><input type="text" id="g9" placeholder="이 페이지에서만 할인가로 구매할 수 있습니다."></div>
+            </div>
+          </div>
+        </details>
       </div>
-    </details>
+
+    </div>
+
+    <div class="panefoot">
+      <div class="grow">
+        <p class="hint" id="histNote" style="margin:0"></p>
+        <p class="hint" id="lockMsg" style="margin:0"></p>
+      </div>
+      <button id="prevStep">← 이전</button>
+      <button id="t1Save" class="solid">저장</button>
+      <button id="nextStep" class="solid">다음 →</button>
+      <button id="histSave" hidden></button>
+    </div>
   </div>
 
-  <p class="lock" id="lockMsg"></p>
-  <div class="actions">
-    <button class="solid" id="dlBoth">JPG 2장 저장</button>
-    <button id="dlThumb">썸네일만</button>
+  <div class="preview" id="stage">
+    <div class="pvhead">
+      <span>미리보기</span>
+      <div class="zoombar">
+        <button id="zoomOut">−</button><b id="zoomVal">100%</b><button id="zoomIn">＋</button>
+        <button id="zoomFit">화면 맞춤</button>
+      </div>
+    </div>
+    <input type="range" id="pvZoom" min="15" max="100" value="40" hidden>
+    <div class="canvases">
+      <div class="frame" id="fT"><canvas id="cT" width="528" height="659"></canvas>
+        <p>썸네일 528 × 659</p></div>
+      <div class="frame" id="fD"><canvas id="cD" width="860" height="2440"></canvas>
+        <p>상세 860 × <span id="dh">2440</span></p></div>
+    </div>
   </div>
-</div>
-
-<div class="stage" id="stage">
-  <div class="zoombar">
-    <span>미리보기</span>
-    <input type="range" id="pvZoom" min="15" max="100" value="40">
-    <b id="zoomVal">40%</b>
-    <button id="zoomFit" class="mini">화면 맞춤</button>
-  </div>
-  <div class="canvases">
-    <div class="frame" id="fT"><h3>THUMBNAIL 528 × 659</h3><canvas id="cT" width="528" height="659"></canvas></div>
-    <div class="frame" id="fD"><h3>DETAIL 860 × <span id="dh">2440</span></h3><canvas id="cD" width="860" height="2440"></canvas></div>
-  </div>
-</div>
 </div>
 
 <script>
@@ -412,6 +477,10 @@ document.addEventListener('input',e=>{
 });
 document.addEventListener('click',e=>{
   if(e.target.dataset.copypath){ copyText(NAS_PATH,e.target); return; }
+  const card=e.target.closest('[data-load]');
+  if(card){ const id=card.dataset.load;
+    fillProducts(id); $('histP1').value=id; applyProductPlaceholders();
+    loadSaved(id).then(()=>goStep(2)); return; }
   const d=e.target.closest('[data-drop]');
   if(d){ const i=+d.dataset.drop;
     pick(im=>normalize(im,IMG_W,IMG_H,n=>{opts[i].img=n; renderOpts(); draw();})); return; }
@@ -583,8 +652,8 @@ const Store = {
   /* --- 목록(가벼운 메타) --- */
   async list(){
     if(this.mode==='sheet') return (await api({action:'list'})).rows;
-    if(!LS) return MEM.map(x=>({id:x.id,name:x.name,date:x.date,ts:x.ts}));
-    return this._all().map(x=>({id:x.id,name:x.name,date:x.date,ts:x.ts}));
+    return this._all().map(x=>({id:x.id,name:x.name,date:x.date,ts:x.ts,
+                                preview:(x.data&&x.data.preview)||''}));
   },
 
   /* --- 제품 1건 전체 --- */
@@ -606,12 +675,13 @@ const Store = {
       return this._write(list);
     }
     const d=JSON.parse(JSON.stringify(item.data)), ids=[];
+    if(d.preview){ d.preview=await toFileId(d.preview,item.name+'_pv'); ids.push(d.preview); }
     if(d.thumb){ d.thumb=await toFileId(d.thumb,item.name+'_thumb'); ids.push(d.thumb); }
     for(let i=0;i<(d.opts||[]).length;i++){
       if(d.opts[i].img){ d.opts[i].img=await toFileId(d.opts[i].img,item.name+'_opt'+(i+1)); ids.push(d.opts[i].img); }
     }
     await api({action:'save',productId:item.id,productName:item.name,
-               payload:JSON.stringify(d),images:ids,user:item.user||''});
+               payload:JSON.stringify(d),images:ids,preview:d.preview||'',user:item.user||''});
     return true;
   },
 
@@ -663,8 +733,18 @@ function ago(ts){
 function stamp(){ const d=new Date(), z=n=>String(n).padStart(2,'0');
   return d.getFullYear()+'.'+z(d.getMonth()+1)+'.'+z(d.getDate())+' '+z(d.getHours())+':'+z(d.getMinutes()); }
 
+function previewShot(){            // 히스토리 카드에 쓸 작은 썸네일 렌더
+  try{
+    const w=132,ht=165,cv=document.createElement('canvas');
+    cv.width=w; cv.height=ht;
+    const c=cv.getContext('2d');
+    c.fillStyle='#fff'; c.fillRect(0,0,w,ht);
+    c.drawImage($('cT'),0,0,w,ht);
+    return cv.toDataURL('image/jpeg',0.7);
+  }catch(e){ return null; }
+}
 function snapshot(){
-  const s={fields:{},opts:[],thumb:thumbImg?thumbImg.src:null,crop:Object.assign({},thumbCrop),
+  const s={fields:{},opts:[],preview:previewShot(),thumb:thumbImg?thumbImg.src:null,crop:Object.assign({},thumbCrop),
            logo:(logoImg&&logoImg.src!==LOGO_SRC)?logoImg.src:null};
   GIDS.forEach(id=>s.fields[id]=$(id).value);
   s.opts=opts.map(o=>({name:o.name,tag:o.tag,l1:o.l1,l2:o.l2,
@@ -823,11 +903,37 @@ async function loadSaved(id){
   renderHist();
 }
 
+const PV=new Map();                 // 제품ID → 미리보기 data URL
+async function drawHistCards(list){
+  const box=$('histList');
+  if(!box) return;
+  const rows=list.slice().sort((a,b)=>(b.ts||0)-(a.ts||0));
+  const show=$('histAll').dataset.all ? rows : rows.slice(0,3);
+  box.innerHTML = show.length ? show.map(r=>
+      '<div class="hcard" data-load="'+esc(r.id)+'">'
+      +'<div class="thumb">'+(PV.get(r.id)?'<img src="'+PV.get(r.id)+'">':'<span>없음</span>')+'</div>'
+      +'<div class="meta"><b>'+esc(r.name)+'</b><span>'+esc(r.date||'')+'</span></div>'
+      +'<div class="go">›</div></div>').join('')
+    : '<p class="hint" style="margin:0">저장된 작업이 없습니다. 아래에서 제품을 고르거나 새로 시작하세요.</p>';
+  $('histAll').textContent = $('histAll').dataset.all ? '접기 ‹' : '전체보기 ›';
+  $('histAll').hidden = rows.length<=3;
+
+  for(const r of show){                       // 미리보기는 뒤에서 채워 넣습니다
+    if(!r.preview || PV.has(r.id)) continue;
+    try{
+      const src = Store.mode==='sheet' ? await toDataUrl(r.preview) : r.preview;
+      PV.set(r.id,src);
+      const el=box.querySelector('[data-load="'+r.id+'"] .thumb');
+      if(el) el.innerHTML='<img src="'+src+'">';
+    }catch(e){}
+  }
+}
 async function renderHist(){
   let list=[];
   try{ list=await Store.list(); }catch(e){ setConn('목록 조회 실패: '+e.message,true); }
   SAVED.clear(); list.forEach(x=>SAVED.set(x.id,x));
   fillProducts();
+  drawHistCards(list);
   const cur=list.find(x=>x.id===curId());
   $('histNote').textContent = cur
     ? '최종 수정: '+cur.date+(cur.ts?' ('+ago(cur.ts)+')':'')
@@ -927,9 +1033,34 @@ async function quickSave(){
 }
 $('t1Save').onclick=quickSave;
 
+/* ---------- 단계 이동 ---------- */
+let STEP=1;
+function goStep(n){
+  STEP=Math.max(1,Math.min(3,n));
+  document.querySelectorAll('.pane').forEach(el=>el.classList.toggle('on',+el.dataset.pane===STEP));
+  document.querySelectorAll('.step').forEach(el=>{
+    const s=+el.dataset.step;
+    el.classList.toggle('on',s===STEP);
+    el.classList.toggle('done',s<STEP);
+  });
+  $('prevStep').hidden = STEP===1;
+  $('nextStep').hidden = STEP===3;
+  document.querySelector('.panebox').scrollTop=0;
+}
+document.querySelectorAll('.step').forEach(el=>el.onclick=()=>goStep(+el.dataset.step));
+$('prevStep').onclick=()=>goStep(STEP-1);
+$('nextStep').onclick=()=>goStep(STEP+1);
+$('histAll').onclick=()=>{
+  const a=$('histAll');
+  if(a.dataset.all) delete a.dataset.all; else a.dataset.all='1';
+  renderHist();
+};
+$('zoomIn').onclick=()=>applyZoom(+$('pvZoom').value/100+.1);
+$('zoomOut').onclick=()=>applyZoom(+$('pvZoom').value/100-.1);
+
 function draw(){ drawThumb(); drawDetail(); updateLock(); }
 fillProducts();                         // 목록을 먼저 채운 뒤 저장소를 조회합니다
-initCropDrag(); renderOpts(); draw(); window.__fitMode=true; fitZoom();
+initCropDrag(); renderOpts(); draw(); goStep(1); window.__fitMode=true; fitZoom();
 initProducts()
   .then(()=>{ applyProductPlaceholders(); return renderHist(); })
   .catch(e=>{ setConn('초기화 실패: '+e.message,true); fillProducts(); });
