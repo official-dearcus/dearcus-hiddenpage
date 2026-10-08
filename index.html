@@ -104,6 +104,8 @@
   button.selectlike.on i{transform:rotate(180deg);color:var(--green)}
   button.link{border:none;background:none;padding:0;color:var(--mute);font-size:11.5px}
   button.link:hover{color:var(--green)}
+  button.link.armed2{color:var(--green);font-weight:700}
+  #pHint2:not(:empty){color:var(--green)}
   button:disabled{opacity:.42;cursor:not-allowed}
   button:disabled:hover{border-color:var(--edge);color:var(--sub)}
   button.path{width:100%;margin-top:8px;background:var(--chip);border-color:transparent;
@@ -183,6 +185,7 @@
     box-shadow:0 2px 16px rgba(25,31,40,.09)}
   .frame p{margin:9px 0 0;font-size:10.5px;font-weight:700;letter-spacing:.08em;
     color:var(--mute);text-align:center}
+  button.one{display:block;margin:8px auto 0;padding:7px 14px;font-size:11.5px;background:#fff}
 </style>
 
 <div class="topbar">
@@ -219,6 +222,7 @@
         <div class="field">
           <div class="head"><label style="margin:0">히스토리</label>
             <button id="pEdit" class="link">이름 수정</button></div>
+          <p class="hint" id="pHint2" style="margin:0 0 6px"></p>
           <button id="histToggle" class="selectlike">저장된 작업 불러오기<i>▾</i></button>
           <div id="histPanel" class="hbox" hidden>
             <input type="text" id="histSearch" placeholder="제품명 검색">
@@ -252,7 +256,8 @@
         <div class="field"><label>메인타이틀 2행 (Bold 54 · 브랜드 그린)</label>
           <input type="text" id="t2" placeholder="시크릿 특가"></div>
         <div class="field"><label>서브타이틀 앞부분 (Regular 22)</label>
-          <input type="text" id="sub" placeholder="오직 여기서만, 제품명"></div>
+          <input type="text" id="sub" placeholder="오직 여기서만, 제품명">
+          <p class="hint" style="margin-top:6px">끝에 붙는 <b>UP TO 00%</b>는 옵션 중 최대 할인율로 자동 입력됩니다.</p></div>
 
         <div class="field"><label>연출컷 528×400 · 드래그로 위치, 슬라이더로 확대</label>
           <div class="drop" id="dropThumb">클릭해서 이미지 선택</div>
@@ -262,8 +267,6 @@
             <div class="row"><button id="cropReset">가운데 정렬</button><button id="cropChange">이미지 변경</button></div>
           </div>
           <button class="path" data-copypath="1">이미지 경로 복사</button></div>
-
-        <p class="hint">서브타이틀 끝의 <b>UP TO 00%</b>는 옵션 중 최대 할인율로 자동 입력됩니다.</p>
       </div>
 
       <!-- ===== STEP 3 ===== -->
@@ -309,9 +312,11 @@
     <input type="range" id="pvZoom" min="15" max="100" value="40" hidden>
     <div class="canvases">
       <div class="frame" id="fT"><canvas id="cT" width="528" height="659"></canvas>
-        <p>썸네일 528 × 659</p></div>
+        <p>썸네일 528 × 659</p>
+        <button class="one" id="oneT">이 이미지만 저장</button></div>
       <div class="frame" id="fD"><canvas id="cD" width="860" height="2440"></canvas>
-        <p>상세 860 × <span id="dh">2440</span></p></div>
+        <p>상세 860 × <span id="dh">2440</span></p>
+        <button class="one" id="oneD">이 이미지만 저장</button></div>
     </div>
   </div>
 </div>
@@ -330,9 +335,10 @@ logoImg.onload=()=>{ const d=document.getElementById('dropLogo');
   if(d) d.innerHTML='<img src="'+logoImg.src+'">'; drawDetail(); };
 logoImg.src=LOGO_SRC;
 const OPT_LABEL='비밀링크 전용 혜택가';
+const AUTO={sub:'',l1:''};   // 자동으로 채워 넣은 값 (사용자가 고치면 건드리지 않습니다)
 const PH={name:OPT_LABEL, tag:'리필 총 40매', l1:'제품명',
           l2:'본품+리필 10매', normal:'39800', sale:'29800', secret:'22900'};
-const blank=()=>({name:OPT_LABEL,tag:'',l1:'',l2:'',normal:'',sale:'',secret:'',img:null});
+const blank=()=>({name:OPT_LABEL,tag:'',l1:AUTO.l1||'',l2:'',normal:'',sale:'',secret:'',img:null});
 let opts=[blank()];
 const F=(o,k)=>o[k].trim()||PH[k];      // 텍스트만 예시값 대체 (가격은 대체하지 않음)
 
@@ -524,7 +530,15 @@ document.addEventListener('click',e=>{
   const card=e.target.closest('[data-load]');
   if(card){ const id=card.dataset.load;
     fillProducts(id); $('histP1').value=id; applyProductPlaceholders();
-    openHist(false); loadSaved(id).then(()=>goStep(2)); return; }
+    openHist(false);
+    if(RENAME_MODE){                       // 이름 수정 모드에서는 그대로 1단계에 머무릅니다
+      RENAME_MODE=false; $('pEdit').classList.remove('armed2'); $('pHint2').textContent='';
+      loadSaved(id).then(()=>window.__openEdit&&window.__openEdit());
+    }else{
+      $('pPanel').hidden=true;
+      loadSaved(id).then(()=>goStep(2));
+    }
+    return; }
   const d=e.target.closest('[data-drop]');
   if(d){ const i=+d.dataset.drop;
     pick(im=>normalize(im,IMG_W,IMG_H,n=>{opts[i].img=n; renderOpts(); draw();})); return; }
@@ -617,7 +631,7 @@ const GIDS=['t1','t2','sub','g0','g1','g2','g3','g4','g5','g6','g8','g9'];
    API_URL 이 비어 있으면 브라우저 로컬 저장소로 동작하고,
    Apps Script 웹앱 URL 을 넣으면 구글시트 + 드라이브로 동작합니다.
    ================================================================ */
-const API_URL   = 'https://script.google.com/macros/s/AKfycbydgdu1_uasQmLhhO6TV_TP995LqDypYE2DKgDXp-CV9p4Bts7vAaTVcb4AeMTMhs-R/exec';                      // 4단계에서 발급받은 /exec URL 을 여기에
+const API_URL   = '';                      // 4단계에서 발급받은 /exec URL 을 여기에
 const API_TOKEN = 'dearcus-hidden-3fb7a8c23bacbbac02b19253';   // .gs 의 TOKEN 과 동일
 
 let LS=null, MEM=[], MEMP=null;
@@ -871,10 +885,16 @@ async function initProducts(){
     openPanel('add'); renderHist();
   };
   $('pEdit').onclick=()=>{
+    if(RENAME_MODE){ RENAME_MODE=false; $('pEdit').classList.remove('armed2');
+      $('pHint2').textContent=''; return; }
     if($('pPanel').hidden===false){ closePanel(); return; }
-    if(!curId()){ alert('수정할 제품을 먼저 선택해 주세요.'); return; }
-    openPanel('edit');
+    if(curId()){ openPanel('edit'); return; }
+    RENAME_MODE=true;                      // 제품을 먼저 고르게 합니다
+    $('pEdit').classList.add('armed2');
+    $('pHint2').textContent='이름을 바꿀 제품을 목록에서 선택해 주세요.';
+    openHist(true);
   };
+  window.__openEdit=()=>openPanel('edit');
   $('histP1').addEventListener('change',()=>{
     if($('histP1').value==='__add__'){ $('histP1').value=''; openPanel('add'); return; }
     closePanel();                       // 제품을 고르는 것만으로는 패널이 열리지 않습니다
@@ -884,12 +904,14 @@ async function initProducts(){
 
   async function doRename(){
     const id=curId(), oldN=curName(), newN=$('pName').value.trim();
+    const followT1 = !$('t1').value.trim() || $('t1').value.trim()===oldN;
     if(!id){ alert('바꿀 제품을 먼저 선택해 주세요.'); return; }
     if(!newN || newN===oldN) return;
     if(PRODUCTS.some(p=>p.name===newN)){ alert('같은 이름의 제품이 이미 있습니다.'); return; }
     PRODUCTS.find(p=>p.id===id).name=newN;   // 연결 키는 제품ID 라 이름을 바꿔도 기록이 유지됩니다
     try{ await Store.setProducts(PRODUCTS); }
     catch(e){ alert('이름 변경에 실패했습니다.\n'+e.message); return; }
+    if(followT1) $('t1').value=newN;      // 제품명이 들어가는 곳을 한 번에 맞춰 줍니다
     fillProducts(id); closePanel(); applyProductPlaceholders(); renderHist();
   }
   async function doAdd(){
@@ -936,31 +958,43 @@ async function initProducts(){
   const del=$('btnDel'); let armTimer=null;
   const disarm=()=>{ del.classList.remove('armed'); del.textContent='삭제하기';
                      clearTimeout(armTimer); armTimer=null; };
-  window.syncDel=()=>{                         // 선택된 제품이 없으면 회색으로 비활성 표시
-    if(curId()) del.classList.remove('off');
-    else { disarm(); del.classList.add('off'); }
-  };
   del.onclick=async()=>{
-    if(!curId()) return;                       // 회색 상태에서는 아무 동작도 하지 않습니다
     if(!del.classList.contains('armed')){
       del.classList.add('armed'); del.textContent='정말 삭제할까요?';
       armTimer=setTimeout(disarm,4000);          // 4초 안에 다시 누르지 않으면 취소
       return;
     }
     disarm();
-    if(await delCurrent()) goStep(1);
+    if(curId()){ if(await delCurrent()) goStep(1); return; }
+    // 선택된 제품이 없으면 지금 입력한 내용만 비웁니다
+    $('histP1').value=''; resetWork(); applyProductPlaceholders(); renderHist(); goStep(1);
   };
-  $('histP1').addEventListener('change',()=>{ disarm(); syncDel(); });
-  syncDel();
+  $('histP1').addEventListener('change',disarm);
 }
 
 const BASE_NAME='제품명';
+function baseName(){                       // 표시에 쓰이는 제품명
+  return $('t1').value.trim() || curName() || BASE_NAME;
+}
+function syncNames(){                      // 메인타이틀 1행을 서브타이틀·상품명 1행에 반영
+  const base=baseName();
+  const nextSub='오직 여기서만, '+base, nextL1=base;
+  $('t1').placeholder = curName() || BASE_NAME;
+  $('sub').placeholder = nextSub;
+  PH.l1 = base;
+
+  const se=$('sub');
+  if(!se.value.trim() || se.value.trim()===AUTO.sub) se.value=nextSub;
+
+  document.querySelectorAll('[data-k="l1"]').forEach(el=>{
+    const i=+el.dataset.i;
+    el.placeholder=base;
+    if(!el.value.trim() || el.value.trim()===AUTO.l1){ el.value=nextL1; if(opts[i]) opts[i].l1=nextL1; }
+  });
+  AUTO.sub=nextSub; AUTO.l1=nextL1;
+}
 function applyProductPlaceholders(){
-  const base = curName() || BASE_NAME;
-  $('t1').placeholder=base;
-  $('sub').placeholder='오직 여기서만, '+base;
-  PH.l1=base;
-  renderOpts(); draw();
+  syncNames(); renderOpts(); draw();
 }
 function resetWork(){                  // 텍스트·이미지·옵션을 전부 비웁니다 (제품 선택은 유지)
   GIDS.forEach(id=>$(id).value='');
@@ -979,9 +1013,7 @@ async function loadSaved(id){
 }
 
 const PV=new Map();                 // 제품ID → 미리보기 data URL
-function refreshDel(){ if(window.syncDel) window.syncDel(); }
 async function drawHistCards(list){
-  refreshDel();
   const box=$('histList');
   if(!box) return;
   const q=$('histSearch').value.trim().toLowerCase();
@@ -1037,16 +1069,33 @@ $('histSave').onclick=async()=>{
   });
 };
 
-function save(cv,name){ cv.toBlob(b=>{
-  const a=document.createElement('a'); a.href=URL.createObjectURL(b); a.download=name; a.click();
-  setTimeout(()=>URL.revokeObjectURL(a.href),1000);
-},'image/jpeg',0.95); }
+function toJpg(cv){                       // 캔버스를 JPG Blob 으로
+  return new Promise(res=>cv.toBlob(res,'image/jpeg',0.95));
+}
+function download(blob,name){
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob); a.download=name;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(()=>URL.revokeObjectURL(a.href),4000);
+}
+function save(cv,name){ toJpg(cv).then(b=>download(b,name)); }
 
-$('dlBoth').onclick=()=>{
+/* 두 장을 순서대로 저장합니다.
+   브라우저가 '여러 파일 다운로드' 를 물어보면 허용해야 상세까지 받아집니다. */
+async function saveBoth(){
+  const btn=$('dlBoth'), label=btn.textContent;
+  btn.textContent='내보내는 중…';
+  const [tj,dj]=await Promise.all([toJpg($('cT')),toJpg($('cD'))]);
+  download(tj,'thumbnail_528x659.jpg');
+  await new Promise(r=>setTimeout(r,900));
+  download(dj,'detail_860x'+detailHeight()+'.jpg');
+  btn.textContent=label;
+}
+
+$('dlBoth').onclick=async()=>{
   if(missingAll().length){ flagLock(); return; }
-  save($('cT'),'thumbnail_528x659.jpg');
-  setTimeout(()=>save($('cD'),'detail_860x'+detailHeight()+'.jpg'),350);
-  setTimeout(()=>quickSave(true),700);      // 출력하면 히스토리에도 자동 저장
+  await saveBoth();
+  quickSave(true);                          // 출력하면 히스토리에도 자동 저장
 };
 
 let LOCK_SHOWN=false;                 // 저장·출력을 눌러본 뒤에만 안내를 띄웁니다
@@ -1068,14 +1117,15 @@ async function copyText(t,btn){
 }
 function applyZoom(z){
   z=Math.max(.15,Math.min(1,z));
-  $('cT').style.width=Math.round(528*z)+'px';
-  $('cD').style.width=Math.round(860*z)+'px';
+  const w=Math.round(528*z);
+  $('cT').style.width=w+'px';
+  $('cD').style.width=w+'px';        // 상세도 썸네일과 같은 가로폭으로 축소해 한눈에 봅니다
   $('zoomVal').value=Math.round(z*100)+'%';
   $('pvZoom').value=Math.round(z*100);
 }
 function fitZoom(){
   const avail=$('stage').clientWidth-56-20-64;   // 스테이지 여백 + 프레임 간격 + 프레임 안쪽 여백
-  applyZoom(avail/(528+860));
+  applyZoom(avail/(528+528));
 }
 $('pvZoom').addEventListener('input',()=>applyZoom(+$('pvZoom').value/100));
 $('zoomFit').onclick=fitZoom;
@@ -1122,7 +1172,7 @@ async function quickSave(silent){
 $('t1Save').onclick=quickSave;
 
 /* ---------- 단계 이동 ---------- */
-let STEP=1;
+let STEP=1, RENAME_MODE=false;
 const STEP_TXT={
   1:['1. 제품 선택','히스토리에서 불러오거나, 새로 시작해주세요.'],
   2:['2. 썸네일','제품명은 메인타이틀 1행입니다.'],
@@ -1182,6 +1232,8 @@ const stepZoom=d=>{                        // ＋ − 는 10% 단위로 딱 떨�
   const next=(d>0 ? Math.floor(cur/10)+1 : Math.ceil(cur/10)-1)*10;
   window.__fitMode=false; applyZoom(next/100);
 };
+$('oneT').onclick=()=>save($('cT'),'thumbnail_528x659.jpg');
+$('oneD').onclick=()=>save($('cD'),'detail_860x'+detailHeight()+'.jpg');
 $('zoomIn').onclick=()=>stepZoom(1);
 $('zoomOut').onclick=()=>stepZoom(-1);
 function commitZoom(){
@@ -1200,7 +1252,7 @@ function syncNav(){
   $('nextStep').classList.toggle('solid', STEP<3 && named);
   $('t1Save').classList.toggle('solid', named);
 }
-function draw(){ drawThumb(); drawDetail(); updateLock(); syncNav(); }
+function draw(){ syncNames(); drawThumb(); drawDetail(); updateLock(); syncNav(); }
 fillProducts();                         // 목록을 먼저 채운 뒤 저장소를 조회합니다
 initCropDrag(); renderOpts(); draw(); goStep(1); window.__fitMode=true; fitZoom();
 initProducts()
